@@ -7,6 +7,7 @@ import com.invoice2x.util.UIConstants;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 
@@ -181,8 +182,8 @@ public class DashboardPanel extends JPanel {
                 }
             }
             
-            thisMonthLabel.setText("$" + monthTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
-            pendingLabel.setText("$" + pendingTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
+            thisMonthLabel.setText("$" + monthTotal.setScale(2, RoundingMode.HALF_UP));
+            pendingLabel.setText("$" + pendingTotal.setScale(2, RoundingMode.HALF_UP));
             
             // Update recent invoices
             recentInvoicesPanel.removeAll();

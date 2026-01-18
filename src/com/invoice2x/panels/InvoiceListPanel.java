@@ -6,11 +6,9 @@ import com.invoice2x.ui.MainFrame;
 import com.invoice2x.util.UIConstants;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.List;
-
-
- // Invoice list panel with search and filter capabilities
 
 public class InvoiceListPanel extends JPanel {
     
@@ -27,33 +25,27 @@ public class InvoiceListPanel extends JPanel {
     
     private void initializeUI() {
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(
-            UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
-            UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE
-        ));
+        setBackground(UIConstants.BG_LIGHT);
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
         
-        // Header
         JPanel headerPanel = createHeader();
         add(headerPanel, BorderLayout.NORTH);
         
-        // Search and filter
         JPanel toolbarPanel = createToolbar();
         add(toolbarPanel, BorderLayout.CENTER);
     }
     
     private JPanel createHeader() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 
-            UIConstants.PADDING_LARGE, 0));
+        panel.setBackground(UIConstants.BG_LIGHT);
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 24, 0));
         
         JLabel titleLabel = new JLabel("Invoice List");
         titleLabel.setFont(UIConstants.HEADER_FONT);
-        titleLabel.setForeground(UIConstants.TEXT_PRIMARY);
+        titleLabel.setForeground(UIConstants.TEXT_DARK);
         
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        buttonPanel.setBackground(UIConstants.BG_LIGHT);
         
         JButton newBtn = UIConstants.createPrimaryButton("New Invoice");
         newBtn.addActionListener(e -> mainFrame.showPanel("newInvoice"));
@@ -61,7 +53,7 @@ public class InvoiceListPanel extends JPanel {
         JButton exportBtn = UIConstants.createSecondaryButton("Export Selected");
         exportBtn.addActionListener(e -> exportSelected());
         
-        JButton deleteBtn = UIConstants.createSecondaryButton("Delete");
+        JButton deleteBtn = UIConstants.createDangerButton("Delete");
         deleteBtn.addActionListener(e -> deleteSelected());
         
         buttonPanel.add(newBtn);
@@ -76,28 +68,26 @@ public class InvoiceListPanel extends JPanel {
     
     private JPanel createToolbar() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(UIConstants.BG_LIGHT);
         
         // Search and filter bar
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        toolbar.setBackground(Color.WHITE);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 12));
+        toolbar.setBackground(UIConstants.BG_LIGHT);
         
-        // Search
-        JLabel searchLabel = new JLabel("Search:");
-        searchLabel.setFont(UIConstants.BODY_FONT);
+        JLabel searchLabel = UIConstants.createLabel("Search:");
         
         searchField = UIConstants.createStyledTextField();
-        searchField.setPreferredSize(new Dimension(250, 32));
+        searchField.setPreferredSize(new Dimension(250, 38));
         searchField.addActionListener(e -> refreshData());
         
-        // Filter
-        JLabel filterLabel = new JLabel("Filter:");
-        filterLabel.setFont(UIConstants.BODY_FONT);
+        JLabel filterLabel = UIConstants.createLabel("Filter:");
         
-        String[] filters = {"All", "Draft", "Pending", "Paid", "Overdue"};
+        String[] filters = {"All", "Draft", "Pending", "Paid", "Overdue", "Cancelled"};
         filterCombo = new JComboBox<>(filters);
         filterCombo.setFont(UIConstants.BODY_FONT);
-        filterCombo.setPreferredSize(new Dimension(150, 32));
+        filterCombo.setBackground(UIConstants.BG_WHITE);
+        filterCombo.setForeground(UIConstants.TEXT_DARK);
+        filterCombo.setPreferredSize(new Dimension(150, 38));
         filterCombo.addActionListener(e -> refreshData());
         
         JButton searchBtn = UIConstants.createPrimaryButton("Search");
@@ -109,10 +99,11 @@ public class InvoiceListPanel extends JPanel {
         toolbar.add(filterCombo);
         toolbar.add(searchBtn);
         
-        // Table
+        // Table with action buttons
         createTable();
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER_COLOR, 1));
+        scrollPane.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER_LIGHT));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
         mainPanel.add(toolbar, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -121,46 +112,265 @@ public class InvoiceListPanel extends JPanel {
     }
     
     private void createTable() {
-        String[] columnNames = {"Select", "Invoice #", "Customer", "Date", "Amount", "Status"};
+        String[] columnNames = {"Select", "Invoice #", "Customer", "Date", "Amount", "Status", "Actions"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int column) {
-                return column == 0 ? Boolean.class : String.class;
+                if (column == 0) return Boolean.class;
+                return String.class;
             }
             
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 0; // Only checkbox editable
+                return column == 0 || column == 6; // Checkbox and Actions
             }
         };
         
         table = new JTable(tableModel);
         table.setFont(UIConstants.BODY_FONT);
-        table.setRowHeight(35);
+        table.setForeground(UIConstants.TEXT_DARK);
+        table.setBackground(UIConstants.BG_WHITE);
+        table.setRowHeight(45);
         table.getTableHeader().setFont(UIConstants.TITLE_FONT);
-        table.getTableHeader().setBackground(UIConstants.BG_SECONDARY);
+        table.getTableHeader().setBackground(UIConstants.BG_LIGHT);
+        table.getTableHeader().setForeground(UIConstants.TEXT_DARK);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setGridColor(UIConstants.BORDER_LIGHT);
+        table.setSelectionBackground(UIConstants.PRIMARY_LIGHT);
         
         // Set column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(50);
-        table.getColumnModel().getColumn(1).setPreferredWidth(120);
-        table.getColumnModel().getColumn(2).setPreferredWidth(200);
-        table.getColumnModel().getColumn(3).setPreferredWidth(100);
-        table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);   // Select
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);  // Invoice #
+        table.getColumnModel().getColumn(2).setPreferredWidth(200);  // Customer
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);  // Date
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);  // Amount
+        table.getColumnModel().getColumn(5).setPreferredWidth(100);  // Status
+        table.getColumnModel().getColumn(6).setPreferredWidth(180);  // Actions
         
-        // Double-click to edit
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
-                    int row = table.getSelectedRow();
-                    if (row >= 0) {
-                        String invoiceNumber = tableModel.getValueAt(row, 1).toString();
-                        editInvoiceByNumber(invoiceNumber);
-                    }
+        // Add custom renderer for Actions column with buttons
+        table.getColumnModel().getColumn(6).setCellRenderer(new ActionButtonRenderer());
+        table.getColumnModel().getColumn(6).setCellEditor(new ActionButtonEditor(new JCheckBox()));
+    }
+    class ActionButtonRenderer extends JPanel implements TableCellRenderer {
+        private JButton viewBtn;
+        private JButton editBtn;
+        
+        public ActionButtonRenderer() {
+            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            setBackground(UIConstants.BG_WHITE);
+            
+            viewBtn = new JButton("View");
+            viewBtn.setFont(UIConstants.SMALL_FONT);
+            viewBtn.setBackground(UIConstants.INFO_COLOR);
+            viewBtn.setForeground(UIConstants.TEXT_WHITE);
+            viewBtn.setFocusPainted(false);
+            viewBtn.setBorderPainted(false);
+            viewBtn.setPreferredSize(new Dimension(75, 32));
+            
+            editBtn = new JButton("Edit");
+            editBtn.setFont(UIConstants.SMALL_FONT);
+            editBtn.setBackground(UIConstants.PRIMARY_COLOR);
+            editBtn.setForeground(UIConstants.TEXT_WHITE);
+            editBtn.setFocusPainted(false);
+            editBtn.setBorderPainted(false);
+            editBtn.setPreferredSize(new Dimension(75, 32));
+            
+            add(viewBtn);
+            add(editBtn);
+        }
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            return this;
+        }
+    }
+    class ActionButtonEditor extends DefaultCellEditor {
+        private JPanel panel;
+        private JButton viewBtn;
+        private JButton editBtn;
+        private int currentRow;
+        
+        public ActionButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            
+            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            panel.setBackground(UIConstants.BG_WHITE);
+            
+            viewBtn = new JButton("View");
+            viewBtn.setFont(UIConstants.SMALL_FONT);
+            viewBtn.setBackground(UIConstants.INFO_COLOR);
+            viewBtn.setForeground(UIConstants.TEXT_WHITE);
+            viewBtn.setFocusPainted(false);
+            viewBtn.setBorderPainted(false);
+            viewBtn.setPreferredSize(new Dimension(75, 32));
+            
+            editBtn = new JButton("Edit");
+            editBtn.setFont(UIConstants.SMALL_FONT);
+            editBtn.setBackground(UIConstants.PRIMARY_COLOR);
+            editBtn.setForeground(UIConstants.TEXT_WHITE);
+            editBtn.setFocusPainted(false);
+            editBtn.setBorderPainted(false);
+            editBtn.setPreferredSize(new Dimension(75, 32));
+            
+            // VIEW BUTTON ACTION
+            viewBtn.addActionListener(e -> {
+                fireEditingStopped();
+                viewInvoice(currentRow);
+            });
+            
+            // EDIT BUTTON ACTION
+            editBtn.addActionListener(e -> {
+                fireEditingStopped();
+                editInvoice(currentRow);
+            });
+            
+            panel.add(viewBtn);
+            panel.add(editBtn);
+        }
+        
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            currentRow = row;
+            return panel;
+        }
+        
+        @Override
+        public Object getCellEditorValue() {
+            return "";
+        }
+    }
+    
+    private void viewInvoice(int row) {
+        try {
+            String invoiceNumber = tableModel.getValueAt(row, 1).toString();
+            DatabaseService db = DatabaseService.getInstance();
+            List<Invoice> allInvoices = db.getAllInvoices();
+            
+            for (Invoice inv : allInvoices) {
+                if (inv.getInvoiceNumber().equals(invoiceNumber)) {
+                    showInvoiceViewDialog(inv);
+                    break;
                 }
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error viewing invoice: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void editInvoice(int row) {
+        try {
+            String invoiceNumber = tableModel.getValueAt(row, 1).toString();
+            DatabaseService db = DatabaseService.getInstance();
+            List<Invoice> allInvoices = db.getAllInvoices();
+            
+            for (Invoice inv : allInvoices) {
+                if (inv.getInvoiceNumber().equals(invoiceNumber)) {
+                    System.out.println("DEBUG: Editing invoice ID: " + inv.getId() + 
+                                     " - " + inv.getInvoiceNumber());
+                    mainFrame.editInvoice(inv.getId());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error loading invoice: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void showInvoiceViewDialog(Invoice invoice) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), 
+                                     "View Invoice - " + invoice.getInvoiceNumber(), true);
+        dialog.setSize(700, 600);
+        dialog.setLocationRelativeTo(this);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(UIConstants.BG_WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Invoice header
+        JLabel titleLabel = new JLabel("Invoice: " + invoice.getInvoiceNumber());
+        titleLabel.setFont(UIConstants.HEADER_FONT);
+        titleLabel.setForeground(UIConstants.PRIMARY_COLOR);
+        panel.add(titleLabel);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        
+        // Invoice details
+        panel.add(createViewRow("Date:", invoice.getInvoiceDate().toString()));
+        panel.add(createViewRow("Due Date:", invoice.getDueDate().toString()));
+        panel.add(createViewRow("Status:", invoice.getStatus().getDisplayName()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        
+        panel.add(createViewRow("Customer:", invoice.getCustomerName()));
+        panel.add(createViewRow("Email:", invoice.getCustomerEmail()));
+        panel.add(createViewRow("Address:", invoice.getCustomerAddress()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        
+        // Items
+        JLabel itemsLabel = new JLabel("Items:");
+        itemsLabel.setFont(UIConstants.TITLE_FONT);
+        panel.add(itemsLabel);
+        
+        for (int i = 0; i < invoice.getItems().size(); i++) {
+            var item = invoice.getItems().get(i);
+            String itemText = String.format("%d. %s - Qty: %s × $%s = $%s",
+                i + 1,
+                item.getDescription(),
+                item.getQuantity(),
+                item.getUnitPrice(),
+                item.getTotal()
+            );
+            JLabel itemLabel = new JLabel(itemText);
+            itemLabel.setFont(UIConstants.BODY_FONT);
+            panel.add(itemLabel);
+        }
+        
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+        
+        // Totals
+        panel.add(createViewRow("Subtotal:", "$" + invoice.getSubtotal()));
+        panel.add(createViewRow("Tax:", "$" + invoice.getTax()));
+        JLabel totalLabel = new JLabel("Total: $" + invoice.getTotal());
+        totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        totalLabel.setForeground(UIConstants.SUCCESS_COLOR);
+        panel.add(totalLabel);
+        
+        if (invoice.getNotes() != null && !invoice.getNotes().isEmpty()) {
+            panel.add(Box.createRigidArea(new Dimension(0, 10)));
+            panel.add(createViewRow("Notes:", invoice.getNotes()));
+        }
+        
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        dialog.add(scrollPane);
+        dialog.setVisible(true);
+    }
+    
+    private JPanel createViewRow(String label, String value) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        row.setBackground(UIConstants.BG_WHITE);
+        
+        JLabel labelComp = new JLabel(label);
+        labelComp.setFont(UIConstants.TITLE_FONT);
+        labelComp.setForeground(UIConstants.TEXT_DARK);
+        
+        JLabel valueComp = new JLabel(value != null ? value : "");
+        valueComp.setFont(UIConstants.BODY_FONT);
+        valueComp.setForeground(UIConstants.TEXT_MEDIUM);
+        
+        row.add(labelComp);
+        row.add(valueComp);
+        
+        return row;
     }
     
     public void refreshData() {
@@ -183,7 +393,7 @@ public class InvoiceListPanel extends JPanel {
                 
                 // Apply status filter
                 if (!filter.equals("All")) {
-                    if (!inv.getStatus().toString().equalsIgnoreCase(filter)) {
+                    if (!inv.getStatus().getDisplayName().equalsIgnoreCase(filter)) {
                         continue;
                     }
                 }
@@ -194,7 +404,8 @@ public class InvoiceListPanel extends JPanel {
                     inv.getCustomerName(),
                     inv.getInvoiceDate().toString(),
                     "$" + inv.getTotal(),
-                    inv.getStatus().getDisplayName()
+                    inv.getStatus().getDisplayName(),
+                    "" // Actions column (buttons rendered)
                 });
             }
             
@@ -207,69 +418,18 @@ public class InvoiceListPanel extends JPanel {
         }
     }
     
-    private void editInvoiceByNumber(String invoiceNumber) {
-        try {
-            DatabaseService db = DatabaseService.getInstance();
-            List<Invoice> invoices = db.getAllInvoices();
-            
-            for (Invoice inv : invoices) {
-                if (inv.getInvoiceNumber().equals(invoiceNumber)) {
-                    mainFrame.editInvoice(inv.getId());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
     private void exportSelected() {
-    List<String> selectedInvoices = getSelectedInvoices();
-    if (selectedInvoices.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "Please select at least one invoice to export",
-            "No Selection",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    try {
-        DatabaseService db = DatabaseService.getInstance();
-        List<Invoice> allInvoices = db.getAllInvoices();
-
-        // Collect IDs of ALL selected invoices
-        java.util.List<Integer> selectedIds = new java.util.ArrayList<>();
-
-        for (String invoiceNumber : selectedInvoices) {
-            for (Invoice inv : allInvoices) {
-                if (inv.getInvoiceNumber().equals(invoiceNumber)) {
-                    selectedIds.add(inv.getId());
-                    break;
-                }
-            }
-        }
-
-        if (selectedIds.isEmpty()) {
+        List<String> selectedInvoices = getSelectedInvoices();
+        if (selectedInvoices.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "Selected invoices not found in database",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                "Please select at least one invoice to export",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        // IMPORTANT: export ALL selected invoices in ONE Excel file (multiple sheets)
-        mainFrame.exportMultipleInvoices(selectedIds);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this,
-            "Error exporting invoices: " + e.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
+        
+        mainFrame.showPanel("export");
     }
-}
-
-
     
     private void deleteSelected() {
         List<String> selectedInvoices = getSelectedInvoices();
@@ -304,7 +464,7 @@ public class InvoiceListPanel extends JPanel {
                 refreshData();
                 
                 JOptionPane.showMessageDialog(this,
-                    "Invoices deleted successfully",
+                    "" + selectedInvoices.size() + " invoice(s) deleted successfully",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
                     
@@ -322,7 +482,7 @@ public class InvoiceListPanel extends JPanel {
         List<String> selected = new java.util.ArrayList<>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             Boolean isSelected = (Boolean) tableModel.getValueAt(i, 0);
-            if (isSelected) {
+            if (isSelected != null && isSelected) {
                 selected.add(tableModel.getValueAt(i, 1).toString());
             }
         }

@@ -260,27 +260,29 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         return statusBar;
     }
     
-    public void showPanel(String panelName) {
-        cardLayout.show(contentPanel, panelName);
-        
-        // Refresh panel data if needed
-        switch (panelName) {
-            case "dashboard":
-                dashboardPanel.refreshData();
-                break;
-            case "invoiceList":
-                invoiceListPanel.refreshData();
-                break;
-            case "newInvoice":
-                invoiceFormPanel.clearForm();
-                break;
-        }
-    }
+public void showPanel(String panelName) {
+    cardLayout.show(contentPanel, panelName);
     
-    public void editInvoice(int invoiceId) {
-        invoiceFormPanel.loadInvoice(invoiceId);
-        showPanel("newInvoice");
+    // Refresh panel data if needed
+    switch (panelName) {
+        case "dashboard":
+            dashboardPanel.refreshData();
+            break;
+        case "invoiceList":
+            invoiceListPanel.refreshData();
+            break;
+        case "newInvoice":
+            // REMOVE THIS LINE:
+            // invoiceFormPanel.clearForm();  
+            break;
     }
+}
+
+public void editInvoice(int invoiceId) {
+    showPanel("newInvoice");                  // 1st: Show form (no clearForm() here)
+    invoiceFormPanel.loadInvoice(invoiceId);  // 2nd: Load data AFTER showing
+}
+
     
     private void showAboutDialog() {
         JOptionPane.showMessageDialog(this,

@@ -9,12 +9,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Invoice Form with SMOOTH SCROLLING
- */
 public class InvoiceFormPanel extends JPanel {
     
     private MainFrame mainFrame;
@@ -34,8 +32,7 @@ public class InvoiceFormPanel extends JPanel {
     private JLabel subtotalLabel;
     private JLabel taxLabel;
     private JLabel totalLabel;
-    // Guard to prevent reentrant calculateTotals calls when updating table model
-    private boolean isCalculatingTotals = false;
+    private boolean calculatingTotals = false;
     
     public InvoiceFormPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -54,10 +51,7 @@ public class InvoiceFormPanel extends JPanel {
         JScrollPane scrollPane = createSmoothScrollPane(formContent);
         add(scrollPane, BorderLayout.CENTER);
     }
-    
-    /**
-     * Create SMOOTH scroll pane with perfect settings
-     */
+
     private JScrollPane createSmoothScrollPane(Component view) {
         JScrollPane scrollPane = new JScrollPane(view);
         scrollPane.setBorder(null);
@@ -156,11 +150,13 @@ public class InvoiceFormPanel extends JPanel {
         invoiceDateField.setText(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         grid.add(invoiceDateField);
         
-        grid.add(UIConstants.createLabel("Status:"));
+        grid.add(UIConstants.createLabel("Status: *"));
         statusCombo = new JComboBox<>(Invoice.InvoiceStatus.values());
-        statusCombo.setFont(UIConstants.BODY_FONT);
+        statusCombo.setFont(new Font("Segoe UI", Font.BOLD, 13));
         statusCombo.setBackground(UIConstants.BG_WHITE);
-        statusCombo.setForeground(UIConstants.TEXT_DARK);
+        statusCombo.setForeground(UIConstants.PRIMARY_COLOR);
+        statusCombo.setPreferredSize(new Dimension(0, 38));
+        statusCombo.setBorder(BorderFactory.createLineBorder(UIConstants.PRIMARY_COLOR, 2));
         grid.add(statusCombo);
         
         grid.add(UIConstants.createLabel("Due Date:"));
@@ -322,7 +318,7 @@ public class InvoiceFormPanel extends JPanel {
         panel.setBackground(UIConstants.BG_LIGHT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
         
-        JButton saveBtn = UIConstants.createSuccessButton("💾 SAVE INVOICE");
+        JButton saveBtn = UIConstants.createSuccessButton("SAVE INVOICE");
         saveBtn.setPreferredSize(new Dimension(200, 46));
         saveBtn.setFont(new Font("Segoe UI", Font.BOLD, 15));
         saveBtn.addActionListener(e -> saveInvoice());
@@ -357,8 +353,9 @@ public class InvoiceFormPanel extends JPanel {
     }
     
     private void calculateTotals() {
-        if (isCalculatingTotals) return;
-        isCalculatingTotals = true;
+        if (calculatingTotals) return; // Prevent infinite recursion
+        
+        calculatingTotals = true;
         BigDecimal subtotal = BigDecimal.ZERO;
         
         for (int i = 0; i < itemsTableModel.getRowCount(); i++) {
@@ -370,7 +367,7 @@ public class InvoiceFormPanel extends JPanel {
                 BigDecimal price = new BigDecimal(priceStr);
                 BigDecimal lineTotal = qty.multiply(price);
                 
-                itemsTableModel.setValueAt(lineTotal.setScale(2, BigDecimal.ROUND_HALF_UP).toString(), i, 4);
+                itemsTableModel.setValueAt(lineTotal.setScale(2, RoundingMode.HALF_UP).toString(), i, 4);
                 subtotal = subtotal.add(lineTotal);
             } catch (Exception e) {
                 // Invalid number, skip
@@ -378,13 +375,14 @@ public class InvoiceFormPanel extends JPanel {
         }
         
         BigDecimal taxRate = new BigDecimal("0.10");
-        BigDecimal tax = subtotal.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal tax = subtotal.multiply(taxRate).setScale(2, RoundingMode.HALF_UP);
         BigDecimal total = subtotal.add(tax);
         
-        subtotalLabel.setText("$" + subtotal.setScale(2, BigDecimal.ROUND_HALF_UP));
+        subtotalLabel.setText("$" + subtotal.setScale(2, RoundingMode.HALF_UP));
         taxLabel.setText("$" + tax);
         totalLabel.setText("$" + total);
-        isCalculatingTotals = false;
+        
+        calculatingTotals = false;
     }
     
     public void clearForm() {
@@ -408,20 +406,46 @@ public class InvoiceFormPanel extends JPanel {
     
     public void loadInvoice(int invoiceId) {
         try {
+            System.out.println("DEBUG loadInvoice: Loading invoice ID: " + invoiceId);
+            
+            // Get invoice from database with ALL data
             currentInvoice = DatabaseService.getInstance().getInvoiceById(invoiceId);
             
+            if (currentInvoice == null) {
+                System.out.println("ERROR: Invoice not found in database!");
+                JOptionPane.showMessageDialog(this,
+                    "Invoice not found!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            System.out.println("DEBUG: Invoice loaded - " + currentInvoice.getInvoiceNumber());
+            System.out.println("DEBUG: Customer - " + currentInvoice.getCustomerName());
+            System.out.println("DEBUG: Items count - " + currentInvoice.getItems().size());
+            
+            // Load ALL fields
             invoiceNumberField.setText(currentInvoice.getInvoiceNumber());
+            invoiceNumberField.setEnabled(false); // Don't allow changing invoice number
+            
             customerNameField.setText(currentInvoice.getCustomerName());
-            customerEmailField.setText(currentInvoice.getCustomerEmail());
-            customerAddressArea.setText(currentInvoice.getCustomerAddress());
+            customerEmailField.setText(currentInvoice.getCustomerEmail() != null ? currentInvoice.getCustomerEmail() : "");
+            customerAddressArea.setText(currentInvoice.getCustomerAddress() != null ? currentInvoice.getCustomerAddress() : "");
+            
             invoiceDateField.setText(currentInvoice.getInvoiceDate().format(DateTimeFormatter.ISO_DATE));
             dueDateField.setText(currentInvoice.getDueDate().format(DateTimeFormatter.ISO_DATE));
-            statusCombo.setSelectedItem(currentInvoice.getStatus());
-            notesArea.setText(currentInvoice.getNotes());
             
+            // Set status
+            statusCombo.setSelectedItem(currentInvoice.getStatus());
+            System.out.println("DEBUG: Status set to - " + currentInvoice.getStatus());
+            
+            notesArea.setText(currentInvoice.getNotes() != null ? currentInvoice.getNotes() : "");
+            
+            // Load items
             itemsTableModel.setRowCount(0);
             int rowNum = 1;
             for (InvoiceItem item : currentInvoice.getItems()) {
+                System.out.println("DEBUG: Loading item " + rowNum + " - " + item.getDescription());
                 itemsTableModel.addRow(new Object[]{
                     rowNum++,
                     item.getDescription(),
@@ -431,9 +455,18 @@ public class InvoiceFormPanel extends JPanel {
                 });
             }
             
+            // Recalculate totals
             calculateTotals();
+            
+            System.out.println("DEBUG: Invoice fully loaded - ready to edit!");
+            
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("ERROR in loadInvoice: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                "Error loading invoice: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
     

@@ -1,6 +1,7 @@
 package com.invoice2x.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,7 +160,7 @@ public class Invoice {
             subtotal = subtotal.add(item.getTotal());
         }
         
-        tax = subtotal.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+        tax = subtotal.multiply(taxRate).setScale(2, RoundingMode.HALF_UP);
         total = subtotal.add(tax);
     }
     

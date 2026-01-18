@@ -15,6 +15,7 @@ public class UIConstants {
     public static final Color SUCCESS_DARK = new Color(5, 150, 105);         // Dark Emerald
     public static final Color WARNING_COLOR = new Color(251, 146, 60);       // Orange
     public static final Color DANGER_COLOR = new Color(239, 68, 68);         // Red
+    public static final Color INFO_COLOR = new Color(59, 130, 246);          // Blue
     
     // BACKGROUND COLORS - All light and clean
     public static final Color BG_WHITE = new Color(255, 255, 255);           // Pure White
@@ -58,7 +59,7 @@ public class UIConstants {
     // Additional background alias used across panels
     public static final Color BG_SECONDARY = BG_LIGHT;
     
-    
+
     public static JButton createPrimaryButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -84,7 +85,6 @@ public class UIConstants {
         
         return button;
     }
-    
     public static JButton createSuccessButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -110,7 +110,6 @@ public class UIConstants {
         
         return button;
     }
-    
     public static JButton createSecondaryButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -138,8 +137,6 @@ public class UIConstants {
         
         return button;
     }
-    
-    
     public static JButton createDangerButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -165,7 +162,6 @@ public class UIConstants {
         
         return button;
     }
-    
     public static JTextField createStyledTextField() {
         JTextField textField = new JTextField();
         textField.setFont(BODY_FONT);
@@ -195,7 +191,6 @@ public class UIConstants {
         
         return textField;
     }
-    
     public static JTextArea createStyledTextArea(int rows, int cols) {
         JTextArea textArea = new JTextArea(rows, cols);
         textArea.setFont(BODY_FONT);
@@ -210,7 +205,6 @@ public class UIConstants {
         ));
         return textArea;
     }
-    
     public static JPanel createCard() {
         JPanel panel = new JPanel();
         panel.setBackground(BG_CARD);
@@ -221,7 +215,6 @@ public class UIConstants {
         ));
         return panel;
     }
-    
     public static JPanel createTitledPanel(String title) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -242,7 +235,6 @@ public class UIConstants {
         
         return panel;
     }
-    
     public static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(BODY_FONT);

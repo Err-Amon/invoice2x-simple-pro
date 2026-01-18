@@ -1,6 +1,7 @@
 package com.invoice2x.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 
  // Invoice item data model representing a single line item
@@ -81,7 +82,7 @@ public class InvoiceItem {
     
     public void calculateTotal() {
         if (quantity != null && unitPrice != null) {
-            this.total = quantity.multiply(unitPrice).setScale(2, BigDecimal.ROUND_HALF_UP);
+            this.total = quantity.multiply(unitPrice).setScale(2, RoundingMode.HALF_UP);
         } else {
             this.total = BigDecimal.ZERO;
         }
