@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Invoice2X Simple Pro
+Comment=Professional invoice management
+Exec=invoice2x
+Icon=invoice2x
+Categories=Office;Finance;
+Terminal=false

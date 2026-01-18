@@ -6,10 +6,6 @@ import com.invoice2x.util.ConfigManager;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Invoice2X Simple Pro - Main Application Entry Point
- * Professional invoice management with Excel export
- */
 public class Main {
     
     public static void main(String[] args) {
@@ -48,8 +44,16 @@ public class Main {
                     System.exit(1);
                 }
                 
-                // Create and show main frame
+                // Create main frame
                 MainFrame mainFrame = new MainFrame();
+                
+                // Ensure proper layout and repaint
+                mainFrame.pack();           // Fit components
+                mainFrame.setLocationRelativeTo(null); // Center on screen
+                mainFrame.revalidate();     // Refresh layout
+                mainFrame.repaint();        // Refresh visuals
+                
+                // Show the frame
                 mainFrame.setVisible(true);
                 
             } catch (Exception e) {

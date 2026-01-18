@@ -1,60 +1,67 @@
-# Invoice2X Simple Pro - Git Ignore File
-
-# Build outputs
-build/
-dist/
-target/
-*.class
-
-# IDE files
-.idea/
-.vscode/
-*.iml
-.classpath
-.project
-.settings/
+# ===============================
+# OS / Desktop environment junk
+# ===============================
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
+# Linux user cache / configs (seen in screenshots)
+.cache/
+.config/
+.local/
 
-# Runtime files - DO NOT COMMIT USER DATA
-invoice2x.db
-invoice2x.properties
-*.db
-*.backup
+# ===============================
+# IDE / Editor files
+# ===============================
+.vscode/
+.idea/
+*.iml
 
+# ===============================
+# Java / Maven build output
+# ===============================
+target/
+*.class
+
+# ===============================
 # Logs
+# ===============================
 *.log
 
-# Package Files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# ===============================
+# Database / runtime data
+# ===============================
+*.db
+*.sqlite
+*.sqlite3
 
-# Maven
-.mvn/
-mvnw
-mvnw.cmd
+# ===============================
+# Environment / local config
+# ===============================
+*.env
+*.properties.local
 
-# Temporary files
+# (Keep shared config if needed)
+invoice2x.properties
+
+# ===============================
+# Installer / build artifacts
+# ===============================
+installer/
+lib/
+
+# Build scripts you want excluded
+build-installer.bat
+build-installer.sh
+build-windows-from-linux.sh
+build.bat
+build.sh
+
+# ===============================
+# Temporary / generated files
+# ===============================
 *.tmp
 *.bak
-~*
-
-# Test files
-test-output/
-
-# Dependencies - IMPORTANT: We don't commit JARs
-lib/*.jar
-
-# But we DO want to keep the lib directory structure
-!lib/.gitkeep
+*.old

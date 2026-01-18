@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-
 public class UIConstants {
     
     // CLEAN COLOR PALETTE - Carefully chosen for readability
@@ -69,6 +68,10 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+
+        // ensure LAF does not override background
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -82,7 +85,6 @@ public class UIConstants {
         return button;
     }
     
-   
     public static JButton createSuccessButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -92,6 +94,10 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+
+        // ensure LAF does not override background
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -105,7 +111,6 @@ public class UIConstants {
         return button;
     }
     
-   
     public static JButton createSecondaryButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -115,6 +120,10 @@ public class UIConstants {
         button.setBorder(BorderFactory.createLineBorder(BORDER_MEDIUM, 1));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+
+        // secondary buttons are also explicitly painted
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -140,6 +149,10 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+
+        // ensure LAF does not override background
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -153,7 +166,6 @@ public class UIConstants {
         return button;
     }
     
-   
     public static JTextField createStyledTextField() {
         JTextField textField = new JTextField();
         textField.setFont(BODY_FONT);
@@ -184,7 +196,6 @@ public class UIConstants {
         return textField;
     }
     
-    
     public static JTextArea createStyledTextArea(int rows, int cols) {
         JTextArea textArea = new JTextArea(rows, cols);
         textArea.setFont(BODY_FONT);
@@ -200,7 +211,6 @@ public class UIConstants {
         return textArea;
     }
     
-   
     public static JPanel createCard() {
         JPanel panel = new JPanel();
         panel.setBackground(BG_CARD);
@@ -212,7 +222,6 @@ public class UIConstants {
         return panel;
     }
     
-   
     public static JPanel createTitledPanel(String title) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -233,7 +242,6 @@ public class UIConstants {
         
         return panel;
     }
-    
     
     public static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);

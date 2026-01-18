@@ -4,12 +4,12 @@ Professional invoice management system with LibreOffice-optimized Excel export. 
 
 ## Features
 
-- ✅ **Professional Invoice Creation** - Easy-to-use forms with real-time calculations
-- ✅ **Excel Export** - LibreOffice Calc compatible XLSX files
-- ✅ **SQLite Database** - Lightweight, no server required
-- ✅ **Offline Operation** - No internet connection needed
-- ✅ **Low Memory Footprint** - Optimized for 4GB RAM systems
-- ✅ **Cross-Platform** - Works on Windows and Linux
+**Professional Invoice Creation** - Easy-to-use forms with real-time calculations
+**Excel Export** - LibreOffice Calc compatible XLSX files
+**SQLite Database** - Lightweight, no server required
+**Offline Operation** - No internet connection needed
+**Low Memory Footprint** - Optimized for 4GB RAM systems
+**Cross-Platform** - Works on Windows and Linux
 
 ## System Requirements
 
@@ -48,16 +48,6 @@ sudo dnf install java-11-openjdk
 2. Navigate to the project directory
 3. Compile using provided build script
 
-**Windows:**
-```bash
-build.bat
-```
-
-**Linux:**
-```bash
-chmod +x build.sh
-./build.sh
-```
 
 ## Project Structure
 
