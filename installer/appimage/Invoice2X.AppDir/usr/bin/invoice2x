@@ -1,3 +1,0 @@
-#!/bin/bash
-APPDIR="$(dirname "$(readlink -f "$0")")/../.."
-java -Xms256m -Xmx1024m -jar "$APPDIR/usr/bin/invoice2x.jar"
