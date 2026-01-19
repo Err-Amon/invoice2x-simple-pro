@@ -3,6 +3,7 @@ package com.invoice2x;
 import com.invoice2x.ui.MainFrame;
 import com.invoice2x.service.DatabaseService;
 import com.invoice2x.util.ConfigManager;
+import com.invoice2x.util.UIConstants;  // Add this import
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,16 +14,25 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         
-        // Set look and feel
+        // Set look and feel - Nimbus for consistent colors
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+            if (UIManager.getLookAndFeel().getName().equals("Default")) {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            }
             
-            // Apply custom UI defaults for professional appearance
+            // Custom UI defaults using your constants
             UIManager.put("Button.arc", 8);
             UIManager.put("Component.arc", 8);
-            UIManager.put("TextComponent.arc", 8);
-            UIManager.put("Button.font", new Font("Segoe UI", Font.PLAIN, 12));
-            UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 12));
+            UIManager.put("TextField.arc", 8);
+            UIManager.put("TextArea.arc", 8);
+            UIManager.put("Button.font", UIConstants.BUTTON_FONT);
+            UIManager.put("Label.font", UIConstants.BODY_FONT);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,10 +41,7 @@ public class Main {
         // Launch application on EDT
         SwingUtilities.invokeLater(() -> {
             try {
-                // Initialize configuration
                 ConfigManager.getInstance();
-                
-                // Initialize database
                 DatabaseService dbService = DatabaseService.getInstance();
                 if (!dbService.initializeDatabase()) {
                     JOptionPane.showMessageDialog(null,
@@ -44,16 +51,11 @@ public class Main {
                     System.exit(1);
                 }
                 
-                // Create main frame
                 MainFrame mainFrame = new MainFrame();
-                
-                // Ensure proper layout and repaint
-                mainFrame.pack();           // Fit components
-                mainFrame.setLocationRelativeTo(null); // Center on screen
-                mainFrame.revalidate();     // Refresh layout
-                mainFrame.repaint();        // Refresh visuals
-                
-                // Show the frame
+                mainFrame.pack();
+                mainFrame.setLocationRelativeTo(null);
+                mainFrame.revalidate();
+                mainFrame.repaint();
                 mainFrame.setVisible(true);
                 
             } catch (Exception e) {
