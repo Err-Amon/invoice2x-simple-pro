@@ -17,6 +17,7 @@ public class InvoiceFormPanel extends JPanel {
     
     private MainFrame mainFrame;
     private Invoice currentInvoice;
+    private JLabel titleLabel;  // Make titleLabel a field for dynamic updates
     
     private JTextField invoiceNumberField;
     private JTextField customerNameField;
@@ -32,6 +33,8 @@ public class InvoiceFormPanel extends JPanel {
     private JLabel subtotalLabel;
     private JLabel taxLabel;
     private JLabel totalLabel;
+    private JButton headerSaveBtn;
+    private JButton bottomSaveBtn;
     private boolean calculatingTotals = false;
     
     public InvoiceFormPanel(MainFrame mainFrame) {
@@ -76,16 +79,16 @@ public class InvoiceFormPanel extends JPanel {
         panel.setBackground(UIConstants.BG_LIGHT);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
         
-        JLabel titleLabel = new JLabel("Create New Invoice");
+        titleLabel = new JLabel("Create New Invoice");  // Initialize as field
         titleLabel.setFont(UIConstants.HEADER_FONT);
         titleLabel.setForeground(UIConstants.TEXT_DARK);
         
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
         buttonPanel.setBackground(UIConstants.BG_LIGHT);
         
-        JButton saveBtn = UIConstants.createSuccessButton("Save Invoice");
-        saveBtn.setPreferredSize(UIConstants.BUTTON_LARGE);
-        saveBtn.addActionListener(e -> saveInvoice());
+        headerSaveBtn = UIConstants.createSuccessButton("Save Invoice");
+        headerSaveBtn.setPreferredSize(UIConstants.BUTTON_LARGE);
+        headerSaveBtn.addActionListener(e -> saveInvoice());
         
         JButton cancelBtn = UIConstants.createSecondaryButton("Cancel");
         cancelBtn.addActionListener(e -> {
@@ -97,7 +100,7 @@ public class InvoiceFormPanel extends JPanel {
             }
         });
         
-        buttonPanel.add(saveBtn);
+        buttonPanel.add(headerSaveBtn);
         buttonPanel.add(cancelBtn);
         
         panel.add(titleLabel, BorderLayout.WEST);
@@ -318,15 +321,15 @@ public class InvoiceFormPanel extends JPanel {
         panel.setBackground(UIConstants.BG_LIGHT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
         
-        JButton saveBtn = UIConstants.createSuccessButton("SAVE INVOICE");
-        saveBtn.setPreferredSize(new Dimension(200, 46));
-        saveBtn.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        saveBtn.addActionListener(e -> saveInvoice());
+        bottomSaveBtn = UIConstants.createSuccessButton("SAVE INVOICE");
+        bottomSaveBtn.setPreferredSize(new Dimension(200, 46));
+        bottomSaveBtn.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        bottomSaveBtn.addActionListener(e -> saveInvoice());
         
         JButton cancelBtn = UIConstants.createSecondaryButton("Cancel");
         cancelBtn.addActionListener(e -> mainFrame.showPanel("dashboard"));
         
-        panel.add(saveBtn);
+        panel.add(bottomSaveBtn);
         panel.add(cancelBtn);
         
         return panel;
@@ -388,6 +391,8 @@ public class InvoiceFormPanel extends JPanel {
     public void clearForm() {
         try {
             currentInvoice = new Invoice();
+            titleLabel.setText("Create New Invoice");  // Update title for new
+            invoiceNumberField.setEnabled(true);  // Enable for new
             invoiceNumberField.setText(DatabaseService.getInstance().generateInvoiceNumber());
             customerNameField.setText("");
             customerEmailField.setText("");
@@ -459,6 +464,8 @@ public class InvoiceFormPanel extends JPanel {
             calculateTotals();
             
             System.out.println("DEBUG: Invoice fully loaded - ready to edit!");
+            titleLabel.setText("Edit Invoice");  // Update title for edit
+            invoiceNumberField.setEnabled(false);  // Already disabled, but ensure
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -489,35 +496,88 @@ public class InvoiceFormPanel extends JPanel {
                 return;
             }
             
-            Invoice invoice = (currentInvoice != null) ? currentInvoice : new Invoice();
-            invoice.setInvoiceNumber(invoiceNumberField.getText());
-            invoice.setCustomerName(customerNameField.getText());
-            invoice.setCustomerEmail(customerEmailField.getText());
-            invoice.setCustomerAddress(customerAddressArea.getText());
-            invoice.setInvoiceDate(LocalDate.parse(invoiceDateField.getText()));
-            invoice.setDueDate(LocalDate.parse(dueDateField.getText()));
-            invoice.setStatus((Invoice.InvoiceStatus) statusCombo.getSelectedItem());
-            invoice.setNotes(notesArea.getText());
-            
-            invoice.getItems().clear();
+            // Validate table data
             for (int i = 0; i < itemsTableModel.getRowCount(); i++) {
-                InvoiceItem item = new InvoiceItem();
-                item.setDescription(itemsTableModel.getValueAt(i, 1).toString());
-                item.setQuantity(new BigDecimal(itemsTableModel.getValueAt(i, 2).toString()));
-                item.setUnitPrice(new BigDecimal(itemsTableModel.getValueAt(i, 3).toString()));
-                item.calculateTotal();
-                invoice.addItem(item);
+                try {
+                    new BigDecimal(itemsTableModel.getValueAt(i, 2).toString());
+                    new BigDecimal(itemsTableModel.getValueAt(i, 3).toString());
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this,
+                        "Invalid number in row " + (i + 1) + ". Please enter valid quantity and unit price.",
+                        "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
             }
             
-            invoice.calculateTotals(new BigDecimal("0.10"));
-            DatabaseService.getInstance().saveInvoice(invoice);
+            // Validate dates
+            try {
+                LocalDate.parse(invoiceDateField.getText());
+                LocalDate.parse(dueDateField.getText());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Invalid date format. Please use YYYY-MM-DD format.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             
-            JOptionPane.showMessageDialog(this,
-                "Invoice saved successfully!\n\nInvoice: " + invoice.getInvoiceNumber(),
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            mainFrame.showPanel("invoiceList");
+            // Run save operation in background thread
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                private Invoice invoice;
+                private Exception error;
+                
+                @Override
+                protected Void doInBackground() throws Exception {
+                    try {
+                        invoice = (currentInvoice != null) ? currentInvoice : new Invoice();
+                        invoice.setInvoiceNumber(invoiceNumberField.getText());
+                        invoice.setCustomerName(customerNameField.getText());
+                        invoice.setCustomerEmail(customerEmailField.getText());
+                        invoice.setCustomerAddress(customerAddressArea.getText());
+                        invoice.setInvoiceDate(LocalDate.parse(invoiceDateField.getText()));
+                        invoice.setDueDate(LocalDate.parse(dueDateField.getText()));
+                        invoice.setStatus((Invoice.InvoiceStatus) statusCombo.getSelectedItem());
+                        invoice.setNotes(notesArea.getText());
+                        
+                        invoice.getItems().clear();
+                        for (int i = 0; i < itemsTableModel.getRowCount(); i++) {
+                            InvoiceItem item = new InvoiceItem();
+                            item.setDescription(itemsTableModel.getValueAt(i, 1).toString());
+                            item.setQuantity(new BigDecimal(itemsTableModel.getValueAt(i, 2).toString()));
+                            item.setUnitPrice(new BigDecimal(itemsTableModel.getValueAt(i, 3).toString()));
+                            item.calculateTotal();
+                            invoice.addItem(item);
+                        }
+                        
+                        invoice.calculateTotals(new BigDecimal("0.10"));
+                        DatabaseService.getInstance().saveInvoice(invoice);
+                    } catch (Exception e) {
+                        error = e;
+                        throw e;
+                    }
+                    return null;
+                }
+                
+                @Override
+                protected void done() {
+                    try {
+                        get(); // Check for exceptions
+                        JOptionPane.showMessageDialog(InvoiceFormPanel.this,
+                            "Invoice saved successfully!\n\nInvoice: " + invoice.getInvoiceNumber(),
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                        mainFrame.showPanel("invoiceList");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(InvoiceFormPanel.this,
+                            "Error saving invoice: " + (error != null ? error.getMessage() : e.getMessage()),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            };
+            worker.execute();
             
         } catch (Exception e) {
             e.printStackTrace();

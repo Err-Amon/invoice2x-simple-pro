@@ -6,6 +6,7 @@ import com.invoice2x.model.Invoice;
 import com.invoice2x.service.DatabaseService;
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 
 
  // Main application window with SMOOTH scrolling
@@ -272,8 +273,7 @@ public void showPanel(String panelName) {
             invoiceListPanel.refreshData();
             break;
         case "newInvoice":
-            // REMOVE THIS LINE:
-            // invoiceFormPanel.clearForm();  
+            invoiceFormPanel.clearForm();  // Clear form for new invoice
             break;
     }
 }
