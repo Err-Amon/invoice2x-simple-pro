@@ -1,5 +1,5 @@
 package com.invoice2x.ui;
-
+import java.util.List;
 import com.invoice2x.ui.panels.*;
 import com.invoice2x.util.UIConstants;
 import com.invoice2x.model.Invoice;
@@ -276,6 +276,14 @@ public void showPanel(String panelName) {
             invoiceFormPanel.clearForm();  // Clear form for new invoice
             break;
     }
+}
+// In MainFrame.java - add this method
+public void showExportPanel(List<String> selectedInvoiceNumbers) {
+    // The exportPanel is already created as a field in this class
+    if (exportPanel != null) {
+        exportPanel.setSelectedInvoiceNumbers(selectedInvoiceNumbers);
+    }
+    showPanel("export");
 }
 
 public void editInvoice(int invoiceId) {

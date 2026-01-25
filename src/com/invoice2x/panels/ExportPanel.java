@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.sql.SQLException;
 
 
  // FIXED Export Panel - Unique filenames and correct data
@@ -216,11 +217,33 @@ private java.util.List<Invoice> preloadedInvoices; // for multi-select batch fro
 public void setPreloadedInvoices(java.util.List<Invoice> invoices) {
     this.preloadedInvoices = invoices;
 }
+// Add this new method after the existing setPreloadedInvoices method
+public void setSelectedInvoiceNumbers(List<String> invoiceNumbers) {
+    if (invoiceNumbers != null && !invoiceNumbers.isEmpty()) {
+        try {
+            DatabaseService db = DatabaseService.getInstance();
+            preloadedInvoices = new java.util.ArrayList<>();
+            
+            for (String invoiceNumber : invoiceNumbers) {
+                Invoice invoice = db.getInvoiceByNumber(invoiceNumber);
+                if (invoice != null) {
+                    preloadedInvoices.add(invoice);
+                }
+            }
+            
+            System.out.println("DEBUG: Loaded " + preloadedInvoices.size() + " invoices for export");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Error loading selected invoices: " + e.getMessage(),
+                "Database Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
 
     
-    /**
-     * FIX: Generate unique filename with timestamp
-     */
+   
     private void updateDefaultFilename() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String defaultPath = System.getProperty("user.home") + File.separator + 

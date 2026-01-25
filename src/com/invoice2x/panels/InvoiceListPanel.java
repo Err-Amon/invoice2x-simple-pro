@@ -419,17 +419,18 @@ public class InvoiceListPanel extends JPanel {
     }
     
     private void exportSelected() {
-        List<String> selectedInvoices = getSelectedInvoices();
-        if (selectedInvoices.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Please select at least one invoice to export",
-                "No Selection",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        mainFrame.showPanel("export");
+    List<String> selectedInvoices = getSelectedInvoices();
+    if (selectedInvoices.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+            "Please select at least one invoice to export",
+            "No Selection",
+            JOptionPane.WARNING_MESSAGE);
+        return;
     }
+    
+    // Pass the selected invoices to the export panel
+    mainFrame.showExportPanel(selectedInvoices);
+}
     
     private void deleteSelected() {
         List<String> selectedInvoices = getSelectedInvoices();

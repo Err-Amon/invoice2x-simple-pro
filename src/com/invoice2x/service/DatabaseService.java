@@ -231,6 +231,28 @@ public class DatabaseService {
         pstmt.close();
         return invoice;
     }
+    public Invoice getInvoiceByNumber(String invoiceNumber) throws SQLException {
+    String sql = "SELECT * FROM invoices WHERE invoice_number=?";
+    PreparedStatement pstmt = connection.prepareStatement(sql);
+    pstmt.setString(1, invoiceNumber);
+    
+    ResultSet rs = pstmt.executeQuery();
+    Invoice invoice = null;
+    
+    if (rs.next()) {
+        invoice = mapResultSetToInvoice(rs);
+        // CRITICAL: Always load items
+        int invoiceId = rs.getInt("id");
+        invoice.setItems(getInvoiceItems(invoiceId));
+        
+        System.out.println("DEBUG: Loaded invoice by number " + invoiceNumber + 
+                         " with " + invoice.getItems().size() + " items");
+    }
+    
+    rs.close();
+    pstmt.close();
+    return invoice;
+}
     
     
     public List<Invoice> getAllInvoices() throws SQLException {
