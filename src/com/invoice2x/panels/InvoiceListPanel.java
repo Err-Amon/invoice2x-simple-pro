@@ -4,6 +4,7 @@ import com.invoice2x.model.Invoice;
 import com.invoice2x.service.DatabaseService;
 import com.invoice2x.ui.MainFrame;
 import com.invoice2x.util.UIConstants;
+import com.invoice2x.util.ConfigManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -130,7 +131,7 @@ public class InvoiceListPanel extends JPanel {
         table.setFont(UIConstants.BODY_FONT);
         table.setForeground(UIConstants.TEXT_DARK);
         table.setBackground(UIConstants.BG_WHITE);
-        table.setRowHeight(45);
+        table.setRowHeight(50);
         table.getTableHeader().setFont(UIConstants.TITLE_FONT);
         table.getTableHeader().setBackground(UIConstants.BG_LIGHT);
         table.getTableHeader().setForeground(UIConstants.TEXT_DARK);
@@ -140,12 +141,12 @@ public class InvoiceListPanel extends JPanel {
         
         // Set column widths
         table.getColumnModel().getColumn(0).setPreferredWidth(50);   // Select
-        table.getColumnModel().getColumn(1).setPreferredWidth(120);  // Invoice #
-        table.getColumnModel().getColumn(2).setPreferredWidth(200);  // Customer
-        table.getColumnModel().getColumn(3).setPreferredWidth(100);  // Date
-        table.getColumnModel().getColumn(4).setPreferredWidth(100);  // Amount
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);  // Status
-        table.getColumnModel().getColumn(6).setPreferredWidth(180);  // Actions
+        table.getColumnModel().getColumn(1).setPreferredWidth(140);  // Invoice #
+        table.getColumnModel().getColumn(2).setPreferredWidth(220);  // Customer
+        table.getColumnModel().getColumn(3).setPreferredWidth(110);  // Date
+        table.getColumnModel().getColumn(4).setPreferredWidth(110);  // Amount
+        table.getColumnModel().getColumn(5).setPreferredWidth(110);  // Status
+        table.getColumnModel().getColumn(6).setPreferredWidth(200);  // Actions
         
         // Add custom renderer for Actions column with buttons
         table.getColumnModel().getColumn(6).setCellRenderer(new ActionButtonRenderer());
@@ -156,7 +157,7 @@ public class InvoiceListPanel extends JPanel {
         private JButton editBtn;
         
         public ActionButtonRenderer() {
-            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            setLayout(new FlowLayout(FlowLayout.CENTER, 8, 5));
             setBackground(UIConstants.BG_WHITE);
             
             viewBtn = new JButton("View");
@@ -165,7 +166,7 @@ public class InvoiceListPanel extends JPanel {
             viewBtn.setForeground(UIConstants.TEXT_WHITE);
             viewBtn.setFocusPainted(false);
             viewBtn.setBorderPainted(false);
-            viewBtn.setPreferredSize(new Dimension(75, 32));
+            viewBtn.setPreferredSize(new Dimension(80, 36));
             
             editBtn = new JButton("Edit");
             editBtn.setFont(UIConstants.SMALL_FONT);
@@ -173,7 +174,7 @@ public class InvoiceListPanel extends JPanel {
             editBtn.setForeground(UIConstants.TEXT_WHITE);
             editBtn.setFocusPainted(false);
             editBtn.setBorderPainted(false);
-            editBtn.setPreferredSize(new Dimension(75, 32));
+            editBtn.setPreferredSize(new Dimension(80, 36));
             
             add(viewBtn);
             add(editBtn);
@@ -194,7 +195,7 @@ public class InvoiceListPanel extends JPanel {
         public ActionButtonEditor(JCheckBox checkBox) {
             super(checkBox);
             
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 5));
             panel.setBackground(UIConstants.BG_WHITE);
             
             viewBtn = new JButton("View");
@@ -203,7 +204,7 @@ public class InvoiceListPanel extends JPanel {
             viewBtn.setForeground(UIConstants.TEXT_WHITE);
             viewBtn.setFocusPainted(false);
             viewBtn.setBorderPainted(false);
-            viewBtn.setPreferredSize(new Dimension(75, 32));
+            viewBtn.setPreferredSize(new Dimension(80, 36));
             
             editBtn = new JButton("Edit");
             editBtn.setFont(UIConstants.SMALL_FONT);
@@ -211,7 +212,7 @@ public class InvoiceListPanel extends JPanel {
             editBtn.setForeground(UIConstants.TEXT_WHITE);
             editBtn.setFocusPainted(false);
             editBtn.setBorderPainted(false);
-            editBtn.setPreferredSize(new Dimension(75, 32));
+            editBtn.setPreferredSize(new Dimension(80, 36));
             
             // VIEW BUTTON ACTION
             viewBtn.addActionListener(e -> {
@@ -321,11 +322,14 @@ public class InvoiceListPanel extends JPanel {
         
         for (int i = 0; i < invoice.getItems().size(); i++) {
             var item = invoice.getItems().get(i);
-            String itemText = String.format("%d. %s - Qty: %s × $%s = $%s",
+            String currencySymbol = ConfigManager.getInstance().getProperty("invoice.currency", "$");
+            String itemText = String.format("%d. %s - Qty: %s × %s%s = %s%s",
                 i + 1,
                 item.getDescription(),
                 item.getQuantity(),
+                currencySymbol,
                 item.getUnitPrice(),
+                currencySymbol,
                 item.getTotal()
             );
             JLabel itemLabel = new JLabel(itemText);
@@ -336,9 +340,10 @@ public class InvoiceListPanel extends JPanel {
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
         
         // Totals
-        panel.add(createViewRow("Subtotal:", "$" + invoice.getSubtotal()));
-        panel.add(createViewRow("Tax:", "$" + invoice.getTax()));
-        JLabel totalLabel = new JLabel("Total: $" + invoice.getTotal());
+        String currencySymbol = ConfigManager.getInstance().getProperty("invoice.currency", "$");
+        panel.add(createViewRow("Subtotal:", currencySymbol + invoice.getSubtotal()));
+        panel.add(createViewRow("Tax:", currencySymbol + invoice.getTax()));
+        JLabel totalLabel = new JLabel("Total: " + currencySymbol + invoice.getTotal());
         totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         totalLabel.setForeground(UIConstants.SUCCESS_COLOR);
         panel.add(totalLabel);
@@ -403,7 +408,7 @@ public class InvoiceListPanel extends JPanel {
                     inv.getInvoiceNumber(),
                     inv.getCustomerName(),
                     inv.getInvoiceDate().toString(),
-                    "$" + inv.getTotal(),
+                        ConfigManager.getInstance().getProperty("invoice.currency", "$") + inv.getTotal(),
                     inv.getStatus().getDisplayName(),
                     "" // Actions column (buttons rendered)
                 });

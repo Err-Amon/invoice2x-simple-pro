@@ -4,6 +4,7 @@ import com.invoice2x.model.Invoice;
 import com.invoice2x.service.DatabaseService;
 import com.invoice2x.ui.MainFrame;
 import com.invoice2x.util.UIConstants;
+import com.invoice2x.util.ConfigManager;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -71,9 +72,9 @@ public class DashboardPanel extends JPanel {
         panel.setBackground(UIConstants.BG_LIGHT);
         
         // Stats cards row
-        JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 16, 0));
+        JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 20, 0));
         cardsPanel.setBackground(UIConstants.BG_LIGHT);
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         
         JPanel totalCard = createStatCard("Total Invoices", "0", UIConstants.PRIMARY_COLOR);
         JPanel monthCard = createStatCard("This Month", "$0", UIConstants.SUCCESS_COLOR);
@@ -102,8 +103,9 @@ public class DashboardPanel extends JPanel {
         card.setBackground(UIConstants.BG_CARD);
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(UIConstants.BORDER_LIGHT, 1),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createEmptyBorder(24, 24, 24, 24)
         ));
+        card.setOpaque(true);
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -115,12 +117,12 @@ public class DashboardPanel extends JPanel {
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         valueLabel.setForeground(color);
         valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         contentPanel.add(titleLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 12)));
         contentPanel.add(valueLabel);
         
         card.add(contentPanel, BorderLayout.CENTER);
@@ -182,8 +184,9 @@ public class DashboardPanel extends JPanel {
                 }
             }
             
-            thisMonthLabel.setText("$" + monthTotal.setScale(2, RoundingMode.HALF_UP));
-            pendingLabel.setText("$" + pendingTotal.setScale(2, RoundingMode.HALF_UP));
+            String currencySymbol = ConfigManager.getInstance().getProperty("invoice.currency", "$");
+            thisMonthLabel.setText(currencySymbol + monthTotal.setScale(2, RoundingMode.HALF_UP));
+            pendingLabel.setText(currencySymbol + pendingTotal.setScale(2, RoundingMode.HALF_UP));
             
             // Update recent invoices
             recentInvoicesPanel.removeAll();

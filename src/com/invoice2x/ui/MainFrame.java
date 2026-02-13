@@ -32,18 +32,22 @@ public class MainFrame extends JFrame {
     
     private void initializeFrame() {
         setTitle("Invoice2X Simple Pro");
-        setSize(1200, 800);
-        setMinimumSize(new Dimension(1000, 700));
+        setSize(1280, 850);
+        setMinimumSize(new Dimension(1024, 768));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
         // Set application icon
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/icons/app-icon.png"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/icons/invoice2x-icon.png"));
             setIconImage(icon.getImage());
         } catch (Exception e) {
             // Icon not found, continue
         }
+        
+        // Set window shape and effects
+        setUndecorated(false);
+        getRootPane().setBorder(BorderFactory.createLineBorder(UIConstants.BORDER_LIGHT, 1));
     }
     
     private void createMenuBar() {
@@ -172,23 +176,59 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         navigationPanel = new JPanel();
         navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.Y_AXIS));
         navigationPanel.setBackground(UIConstants.SIDEBAR_BG);
-        navigationPanel.setPreferredSize(new Dimension(200, 0));
+        navigationPanel.setPreferredSize(new Dimension(220, 0));
         navigationPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, UIConstants.BORDER_LIGHT));
         
+        // Add logo or app title
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(UIConstants.SIDEBAR_BG);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(24, 16, 24, 16));
+        
+        JLabel appTitle = new JLabel("Invoice2X");
+        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        appTitle.setForeground(UIConstants.PRIMARY_COLOR);
+        appTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel appSubtitle = new JLabel("Simple Pro");
+        appSubtitle.setFont(UIConstants.SMALL_FONT);
+        appSubtitle.setForeground(UIConstants.TEXT_MEDIUM);
+        appSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        headerPanel.add(appTitle);
+        headerPanel.add(Box.createRigidArea(new Dimension(0, 4)));
+        headerPanel.add(appSubtitle);
+        
+        navigationPanel.add(headerPanel);
+        
         // Add navigation buttons
-        addNavigationButton(" Dashboard", "dashboard");
-        addNavigationButton(" New Invoice", "newInvoice");
-        addNavigationButton(" Invoice List", "invoiceList");
-        addNavigationButton(" Export", "export");
-        addNavigationButton(" Settings", "settings");
+        addNavigationButton("Dashboard", "dashboard");
+        addNavigationButton("New Invoice", "newInvoice");
+        addNavigationButton("Invoice List", "invoiceList");
+        addNavigationButton("Export", "export");
+        addNavigationButton("Settings", "settings");
         
         // Add spacer
         navigationPanel.add(Box.createVerticalGlue());
+        
+        // Add version info
+        JPanel footerPanel = new JPanel();
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+        footerPanel.setBackground(UIConstants.SIDEBAR_BG);
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 24, 16));
+        
+        JLabel versionLabel = new JLabel("v1.0.0");
+        versionLabel.setFont(UIConstants.SMALL_FONT);
+        versionLabel.setForeground(UIConstants.TEXT_LIGHT);
+        versionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        footerPanel.add(versionLabel);
+        navigationPanel.add(footerPanel);
     }
     
     private void addNavigationButton(String text, String panelName) {
         JButton button = new JButton(text);
-        button.setMaximumSize(new Dimension(200, 45));
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFont(UIConstants.BODY_FONT);
         button.setFocusPainted(false);
@@ -197,7 +237,7 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         button.setForeground(UIConstants.TEXT_DARK);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        button.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         
         button.addActionListener(e -> showPanel(panelName));
         
@@ -209,6 +249,14 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setOpaque(false);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                button.setBackground(UIConstants.PRIMARY_LIGHT);
+                button.setOpaque(true);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                button.setBackground(UIConstants.HOVER_BG);
+                button.setOpaque(true);
             }
         });
         

@@ -5,6 +5,8 @@ import com.invoice2x.model.InvoiceItem;
 import com.invoice2x.service.DatabaseService;
 import com.invoice2x.ui.MainFrame;
 import com.invoice2x.util.UIConstants;
+import com.invoice2x.util.ConfigManager;
+import com.invoice2x.util.ConfigManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -377,13 +379,17 @@ public class InvoiceFormPanel extends JPanel {
             }
         }
         
-        BigDecimal taxRate = new BigDecimal("0.10");
+        // Get tax rate from config
+        String taxRateStr = ConfigManager.getInstance().getProperty("invoice.taxrate", "10");
+        BigDecimal taxRate = new BigDecimal(taxRateStr).divide(new BigDecimal("100"));
         BigDecimal tax = subtotal.multiply(taxRate).setScale(2, RoundingMode.HALF_UP);
         BigDecimal total = subtotal.add(tax);
         
-        subtotalLabel.setText("$" + subtotal.setScale(2, RoundingMode.HALF_UP));
-        taxLabel.setText("$" + tax);
-        totalLabel.setText("$" + total);
+        // Get currency symbol from config
+        String currencySymbol = ConfigManager.getInstance().getProperty("invoice.currency", "$");
+        subtotalLabel.setText(currencySymbol + subtotal.setScale(2, RoundingMode.HALF_UP));
+        taxLabel.setText(currencySymbol + tax);
+        totalLabel.setText(currencySymbol + total);
         
         calculatingTotals = false;
     }

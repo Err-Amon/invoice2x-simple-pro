@@ -6,29 +6,34 @@ import javax.swing.border.Border;
 
 public class UIConstants {
     
-    // CLEAN COLOR PALETTE - Carefully chosen for readability
-    public static final Color PRIMARY_COLOR = new Color(99, 102, 241);       // Indigo
-    public static final Color PRIMARY_DARK = new Color(79, 70, 229);         // Deep Indigo
-    public static final Color PRIMARY_LIGHT = new Color(224, 231, 255);      // Very Light Indigo
+    // MODERN COLOR PALETTE - Professional and accessible
+    public static final Color PRIMARY_COLOR = new Color(66, 153, 225);       // Professional Blue
+    public static final Color PRIMARY_DARK = new Color(45, 120, 180);         // Dark Blue
+    public static final Color PRIMARY_LIGHT = new Color(217, 237, 252);      // Light Blue
+    public static final Color PRIMARY_ACCENT = new Color(96, 165, 250);      // Blue Accent
     
-    public static final Color SUCCESS_COLOR = new Color(16, 185, 129);       // Emerald
-    public static final Color SUCCESS_DARK = new Color(5, 150, 105);         // Dark Emerald
-    public static final Color WARNING_COLOR = new Color(251, 146, 60);       // Orange
-    public static final Color DANGER_COLOR = new Color(239, 68, 68);         // Red
-    public static final Color INFO_COLOR = new Color(59, 130, 246);          // Blue
+    public static final Color SUCCESS_COLOR = new Color(72, 187, 120);       // Green
+    public static final Color SUCCESS_DARK = new Color(45, 166, 98);         // Dark Green
+    public static final Color WARNING_COLOR = new Color(255, 193, 7);        // Amber
+    public static final Color WARNING_DARK = new Color(255, 160, 0);         // Dark Amber
+    public static final Color DANGER_COLOR = new Color(244, 67, 54);         // Red
+    public static final Color DANGER_DARK = new Color(211, 47, 47);          // Dark Red
+    public static final Color INFO_COLOR = new Color(33, 150, 243);          // Info Blue
     
-    // BACKGROUND COLORS - All light and clean
+    // BACKGROUND COLORS - Modern and clean
     public static final Color BG_WHITE = new Color(255, 255, 255);           // Pure White
-    public static final Color BG_LIGHT = new Color(249, 250, 251);           // Very Light Gray
+    public static final Color BG_LIGHT = new Color(248, 250, 252);           // Very Light Gray
     public static final Color BG_CARD = new Color(255, 255, 255);            // White Cards
-    public static final Color SIDEBAR_BG = new Color(248, 250, 252);         // Light Sidebar
-    public static final Color HOVER_BG = new Color(241, 245, 249);           // Light Hover
+    public static final Color SIDEBAR_BG = new Color(241, 245, 249);         // Light Sidebar
+    public static final Color HOVER_BG = new Color(230, 236, 245);           // Light Hover
+    public static final Color SELECTED_BG = new Color(217, 237, 252);        // Selected Background
     
-    // TEXT COLORS - High contrast, always readable
+    // TEXT COLORS - High contrast, accessible
     public static final Color TEXT_DARK = new Color(30, 41, 59);             // Dark Gray (readable)
-    public static final Color TEXT_MEDIUM = new Color(100, 116, 139);        // Medium Gray
-    public static final Color TEXT_LIGHT = new Color(148, 163, 184);         // Light Gray
+    public static final Color TEXT_MEDIUM = new Color(71, 85, 105);          // Medium Gray
+    public static final Color TEXT_LIGHT = new Color(100, 116, 139);         // Light Gray
     public static final Color TEXT_WHITE = new Color(255, 255, 255);         // White
+    public static final Color TEXT_DISABLED = new Color(148, 163, 184);      // Disabled Text
 
     // Backwards-compatible aliases for older panel code
     public static final Color TEXT_PRIMARY = TEXT_DARK;
@@ -37,24 +42,28 @@ public class UIConstants {
     public static final Color BORDER_LIGHT = new Color(226, 232, 240);
     public static final Color BORDER_MEDIUM = new Color(203, 213, 225);
     public static final Color BORDER_COLOR = BORDER_LIGHT;
+    public static final Color BORDER_FOCUS = PRIMARY_COLOR;
     
-    // FONTS - Clean and professional
-    public static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 26);
-    public static final Font SUBHEADER_FONT = new Font("Segoe UI", Font.BOLD, 18);
-    public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font BODY_FONT = new Font("Segoe UI", Font.PLAIN, 13);
+    // FONTS - Clean and modern (using system fonts for better cross-platform support)
+    public static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 28);
+    public static final Font SUBHEADER_FONT = new Font("Segoe UI", Font.BOLD, 20);
+    public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 15);
+    public static final Font BODY_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     public static final Font SMALL_FONT = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 13);
+    public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 14);
     
-    // SPACING
+    // SPACING - Consistent and modern
     public static final int PADDING_SMALL = 8;
     public static final int PADDING_MEDIUM = 16;
     public static final int PADDING_LARGE = 24;
+    public static final int PADDING_XL = 32;
     
-    // SIZES
-    public static final Dimension BUTTON_SIZE = new Dimension(140, 40);
-    public static final Dimension BUTTON_LARGE = new Dimension(180, 46);
-    public static final Dimension INPUT_SIZE = new Dimension(300, 38);
+    // SIZES - Optimized for modern interfaces
+    public static final Dimension BUTTON_SIZE = new Dimension(140, 42);
+    public static final Dimension BUTTON_LARGE = new Dimension(180, 48);
+    public static final Dimension BUTTON_XL = new Dimension(220, 52);
+    public static final Dimension INPUT_SIZE = new Dimension(320, 40);
+    public static final Dimension INPUT_SMALL = new Dimension(150, 40);
 
     // Additional background alias used across panels
     public static final Color BG_SECONDARY = BG_LIGHT;
@@ -69,6 +78,7 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         // ensure LAF does not override background
         button.setContentAreaFilled(true);
@@ -77,8 +87,16 @@ public class UIConstants {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(PRIMARY_DARK);
+                button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(PRIMARY_COLOR);
+                button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                button.setBackground(PRIMARY_DARK.darker());
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
                 button.setBackground(PRIMARY_COLOR);
             }
         });
@@ -94,6 +112,7 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         // ensure LAF does not override background
         button.setContentAreaFilled(true);
@@ -102,8 +121,16 @@ public class UIConstants {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(SUCCESS_DARK);
+                button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SUCCESS_COLOR);
+                button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                button.setBackground(SUCCESS_DARK.darker());
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
                 button.setBackground(SUCCESS_COLOR);
             }
         });
@@ -119,6 +146,10 @@ public class UIConstants {
         button.setBorder(BorderFactory.createLineBorder(BORDER_MEDIUM, 1));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_MEDIUM, 1),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
 
         // secondary buttons are also explicitly painted
         button.setContentAreaFilled(true);
@@ -127,11 +158,17 @@ public class UIConstants {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(BG_LIGHT);
-                button.setBorder(BorderFactory.createLineBorder(PRIMARY_COLOR, 2));
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
+                    BorderFactory.createEmptyBorder(8, 18, 8, 18)
+                ));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(BG_WHITE);
-                button.setBorder(BorderFactory.createLineBorder(BORDER_MEDIUM, 1));
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(BORDER_MEDIUM, 1),
+                    BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                ));
             }
         });
         
@@ -146,6 +183,7 @@ public class UIConstants {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         // ensure LAF does not override background
         button.setContentAreaFilled(true);
@@ -153,9 +191,17 @@ public class UIConstants {
         
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(220, 38, 38));
+                button.setBackground(DANGER_DARK);
+                button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(DANGER_COLOR);
+                button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                button.setBackground(DANGER_DARK.darker());
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
                 button.setBackground(DANGER_COLOR);
             }
         });
@@ -170,21 +216,21 @@ public class UIConstants {
         textField.setCaretColor(TEXT_DARK);
         textField.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_LIGHT, 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            BorderFactory.createEmptyBorder(10, 14, 10, 14)
         ));
         textField.setPreferredSize(INPUT_SIZE);
         
         textField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 textField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
-                    BorderFactory.createEmptyBorder(7, 11, 7, 11)
+                    BorderFactory.createLineBorder(BORDER_FOCUS, 2),
+                    BorderFactory.createEmptyBorder(9, 13, 9, 13)
                 ));
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 textField.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(BORDER_LIGHT, 1),
-                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                    BorderFactory.createEmptyBorder(10, 14, 10, 14)
                 ));
             }
         });
@@ -201,7 +247,7 @@ public class UIConstants {
         textArea.setWrapStyleWord(true);
         textArea.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_LIGHT, 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            BorderFactory.createEmptyBorder(10, 14, 10, 14)
         ));
         return textArea;
     }
@@ -213,6 +259,7 @@ public class UIConstants {
             BorderFactory.createEmptyBorder(PADDING_LARGE, PADDING_LARGE, 
                                            PADDING_LARGE, PADDING_LARGE)
         ));
+        panel.setOpaque(true);
         return panel;
     }
     public static JPanel createTitledPanel(String title) {
@@ -240,5 +287,17 @@ public class UIConstants {
         label.setFont(BODY_FONT);
         label.setForeground(TEXT_DARK);  
         return label;
+    }
+    
+    public static JPanel createShadowPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(BG_CARD);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_LIGHT, 1),
+            BorderFactory.createEmptyBorder(PADDING_LARGE, PADDING_LARGE, 
+                                           PADDING_LARGE, PADDING_LARGE)
+        ));
+        panel.setOpaque(true);
+        return panel;
     }
 }

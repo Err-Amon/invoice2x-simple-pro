@@ -8,9 +8,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ExcelExportService {
     
+    private static final Logger logger = Logger.getLogger(ExcelExportService.class.getName());
     private static ExcelExportService instance;
     
     private ExcelExportService() {
@@ -27,6 +30,13 @@ public class ExcelExportService {
     public void exportInvoices(List<Invoice> invoices, String filePath, 
                                ExportProgressListener listener) throws Exception {
         
+        if (invoices == null || invoices.isEmpty()) {
+            throw new IllegalArgumentException("No invoices to export");
+        }
+        
+        logger.log(Level.INFO, "Starting export of {0} invoices to {1}", 
+                  new Object[]{invoices.size(), filePath});
+        
         Workbook workbook = new XSSFWorkbook();
         
         try {
@@ -41,6 +51,8 @@ public class ExcelExportService {
                         "Processing invoice " + current + " of " + invoices.size() + 
                         " (" + invoice.getInvoiceNumber() + ")");
                 }
+                
+                logger.log(Level.FINE, "Processed invoice {0}", invoice.getInvoiceNumber());
             }
             
             // Write to file
@@ -52,6 +64,14 @@ public class ExcelExportService {
                 listener.onComplete(filePath);
             }
             
+            logger.log(Level.INFO, "Export completed successfully to {0}", filePath);
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Export failed: " + e.getMessage(), e);
+            if (listener != null) {
+                listener.onError(e);
+            }
+            throw e;
         } finally {
             workbook.close();
         }
@@ -220,7 +240,8 @@ public class ExcelExportService {
     private CellStyle createCurrencyStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         DataFormat format = workbook.createDataFormat();
-        style.setDataFormat(format.getFormat("$#,##0.00"));
+        String currencySymbol = ConfigManager.getInstance().getProperty("invoice.currency", "$");
+        style.setDataFormat(format.getFormat(currencySymbol + "#,##0.00"));
         return style;
     }
     

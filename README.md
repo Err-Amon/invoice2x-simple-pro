@@ -1,20 +1,23 @@
 # Invoice2X Simple Pro
 
-Professional invoice management system with LibreOffice-optimized Excel export. Built for low-spec systems (4GB RAM) with offline-first design.
+Professional invoice management system with LibreOffice-optimized Excel export. Built for low-spec systems (4GB RAM) with offline-first design and modern UI.
 
 ## Features
 
-**Professional Invoice Creation** - Easy-to-use forms with real-time calculations
-**Excel Export** - LibreOffice Calc compatible XLSX files
-**SQLite Database** - Lightweight, no server required
+**Modern UI Design** - Clean, professional interface with smooth animations and visual hierarchy
+**Professional Invoice Creation** - Easy-to-use forms with real-time calculations and validation
+**Excel Export** - LibreOffice Calc compatible XLSX files with professional formatting
+**SQLite Database** - Lightweight, no server required with optimized queries
 **Offline Operation** - No internet connection needed
 **Low Memory Footprint** - Optimized for 4GB RAM systems
 **Cross-Platform** - Works on Windows and Linux
+**Advanced Search & Filter** - Powerful invoice management with search and status filters
+**Data Backup & Recovery** - Database backup and compacting features
 
 ## System Requirements
 
 - **Operating System**: Windows 10/11 or Linux (Ubuntu 20.04+, Fedora 35+, Linux Mint 20+)
-- **RAM**: Minimum 4GB
+- **RAM**: Minimum 4GB (8GB recommended for large datasets)
 - **Java**: OpenJDK 11 or higher
 - **Disk Space**: 100MB for application + database storage
 
@@ -194,6 +197,8 @@ The application is designed for 4GB RAM systems with:
 - Streaming Excel export (processes one invoice at a time)
 - Lazy loading of invoice lists
 - Minimal UI updates
+- Optimized SQL queries
+- Advanced error handling and logging
 
 ## Database Information
 
@@ -250,6 +255,17 @@ For issues or questions:
 - SQLite database storage
 - Cross-platform support (Windows/Linux)
 - Low-memory optimization
+
+**Version 1.1** (Improvement Release)
+- Modern UI design with blue color scheme
+- Enhanced performance and memory management
+- Advanced error handling and logging
+- Improved database queries
+- Better visual hierarchy and spacing
+- Enhanced Excel export service
+- Modern navigation panel with app title and version info
+- Improved dashboard with larger stat cards
+- Enhanced invoice list with better table design
 
 ## Credits
 

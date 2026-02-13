@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class DatabaseService {
     
+    private static final Logger logger = Logger.getLogger(DatabaseService.class.getName());
     private static DatabaseService instance;
     private Connection connection;
     private static final String DB_URL = "jdbc:sqlite:invoice2x.db";
@@ -28,13 +31,24 @@ public class DatabaseService {
     public boolean initializeDatabase() {
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(DB_URL);
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(DB_URL);
+                connection.setAutoCommit(true);
+            }
             createTables();
+            logger.log(Level.INFO, "Database initialized successfully");
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to initialize database: " + e.getMessage(), e);
             return false;
         }
+    }
+    
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            initializeDatabase();
+        }
+        return connection;
     }
     
     private void createTables() throws SQLException {
@@ -259,26 +273,29 @@ public class DatabaseService {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT * FROM invoices ORDER BY invoice_date DESC";
         
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-        
-        while (rs.next()) {
-            Invoice invoice = mapResultSetToInvoice(rs);
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             
-            // CRITICAL FIX: Load items for EACH invoice
-            int invoiceId = rs.getInt("id");
-            List<InvoiceItem> items = getInvoiceItems(invoiceId);
-            invoice.setItems(items);
+            while (rs.next()) {
+                Invoice invoice = mapResultSetToInvoice(rs);
+                
+                // CRITICAL FIX: Load items for EACH invoice
+                int invoiceId = rs.getInt("id");
+                List<InvoiceItem> items = getInvoiceItems(invoiceId);
+                invoice.setItems(items);
+                
+                logger.log(Level.FINE, "Loaded invoice {0} with {1} items", 
+                          new Object[]{invoice.getInvoiceNumber(), items.size()});
+                
+                invoices.add(invoice);
+            }
             
-            System.out.println("DEBUG: Loaded invoice " + invoice.getInvoiceNumber() + 
-                             " with " + items.size() + " items");
+            logger.log(Level.INFO, "Total invoices loaded: {0}", invoices.size());
             
-            invoices.add(invoice);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error loading invoices: " + e.getMessage(), e);
+            throw e;
         }
-        
-        stmt.close();
-        
-        System.out.println("DEBUG: Total invoices loaded: " + invoices.size());
         
         return invoices;
     }
