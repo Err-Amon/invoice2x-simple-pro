@@ -186,7 +186,7 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         headerPanel.setBorder(BorderFactory.createEmptyBorder(24, 16, 24, 16));
         
         JLabel appTitle = new JLabel("Invoice2X");
-        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         appTitle.setForeground(UIConstants.PRIMARY_COLOR);
         appTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         
@@ -201,7 +201,7 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         
         navigationPanel.add(headerPanel);
         
-        // Add navigation buttons
+        // Add navigation buttons with enhanced styling
         addNavigationButton("Dashboard", "dashboard");
         addNavigationButton("New Invoice", "newInvoice");
         addNavigationButton("Invoice List", "invoiceList");
@@ -211,7 +211,7 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         // Add spacer
         navigationPanel.add(Box.createVerticalGlue());
         
-        // Add version info
+        // Add version info with more details
         JPanel footerPanel = new JPanel();
         footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
         footerPanel.setBackground(UIConstants.SIDEBAR_BG);
@@ -222,7 +222,14 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         versionLabel.setForeground(UIConstants.TEXT_LIGHT);
         versionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
+        JLabel buildLabel = new JLabel("Build: 2026.04.05");
+        buildLabel.setFont(UIConstants.SMALL_FONT);
+        buildLabel.setForeground(UIConstants.TEXT_LIGHT);
+        buildLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         footerPanel.add(versionLabel);
+        footerPanel.add(Box.createRigidArea(new Dimension(0, 4)));
+        footerPanel.add(buildLabel);
         navigationPanel.add(footerPanel);
     }
     
@@ -241,24 +248,40 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
         
         button.addActionListener(e -> showPanel(panelName));
         
-        // Hover effect
+        // Enhanced hover effect with smooth transitions
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(UIConstants.HOVER_BG);
                 button.setOpaque(true);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(UIConstants.PRIMARY_COLOR, 2),
+                    BorderFactory.createEmptyBorder(10, 18, 10, 18)
+                ));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setOpaque(false);
+                button.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 button.setBackground(UIConstants.PRIMARY_LIGHT);
                 button.setOpaque(true);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(UIConstants.PRIMARY_DARK, 2),
+                    BorderFactory.createEmptyBorder(10, 18, 10, 18)
+                ));
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 button.setBackground(UIConstants.HOVER_BG);
                 button.setOpaque(true);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(UIConstants.PRIMARY_COLOR, 2),
+                    BorderFactory.createEmptyBorder(10, 18, 10, 18)
+                ));
             }
         });
+        
+        // Add accessibility tooltip
+        button.setToolTipText("Press Enter to navigate to " + text.toLowerCase());
         
         navigationPanel.add(Box.createRigidArea(new Dimension(0, 4)));
         navigationPanel.add(button);
@@ -312,6 +335,9 @@ public void exportMultipleInvoices(java.util.List<Integer> invoiceIds) {
 public void showPanel(String panelName) {
     cardLayout.show(contentPanel, panelName);
     
+    // Update navigation button states
+    updateNavigationState(panelName);
+    
     // Refresh panel data if needed
     switch (panelName) {
         case "dashboard":
@@ -324,6 +350,33 @@ public void showPanel(String panelName) {
             invoiceFormPanel.clearForm();  // Clear form for new invoice
             break;
     }
+}
+
+private void updateNavigationState(String activePanel) {
+    // Update button states to show active panel
+    for (Component comp : navigationPanel.getComponents()) {
+        if (comp instanceof JButton) {
+            JButton button = (JButton) comp;
+            String panelName = button.getActionListeners()[0].toString().split("\"\\")[1];
+            
+            if (panelName.equals(activePanel)) {
+                button.setOpaque(true);
+                button.setBackground(UIConstants.PRIMARY_COLOR);
+                button.setForeground(UIConstants.TEXT_WHITE);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(UIConstants.PRIMARY_DARK, 2),
+                    BorderFactory.createEmptyBorder(10, 18, 10, 18)
+                ));
+            } else {
+                button.setOpaque(false);
+                button.setBackground(null);
+                button.setForeground(UIConstants.TEXT_DARK);
+                button.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+            }
+        }
+    }
+    navigationPanel.revalidate();
+    navigationPanel.repaint();
 }
 // In MainFrame.java - add this method
 public void showExportPanel(List<String> selectedInvoiceNumbers) {
